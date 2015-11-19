@@ -1613,7 +1613,7 @@ static const luaL_Reg string_functions[] = {
     {"diff", lua_ShortForm_diff},
     {"patch", lua_ShortForm_patch},
     {"goodColumns", lua_good_columns},
-    {"goodSlices", lua_goodSlices},
+    {"goodSlices", wrap<lua_goodSlices>::func},
     {NULL, NULL}
 };
 
