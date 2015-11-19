@@ -191,8 +191,11 @@ public:
         int min_identity, // 0-100
         int min_end
     ) const {
-        frame1 = std::min(frame1, min_end);
-        frame2 = std::min(frame2, frame1);
+        // constraints:
+        // 1 <= min_end <= frame1 <= frame2
+        min_end = std::max(min_end, 1);
+        frame1 = std::max(frame1, min_end);
+        frame2 = std::max(frame2, frame1);
         Coordinates s1, s2;
         makeSimpleRegions(s1);
         joinRegions(s2, s1, frame1, min_identity, min_end);
