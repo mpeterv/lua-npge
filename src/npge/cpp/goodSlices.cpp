@@ -211,6 +211,9 @@ public:
         int min_end
     ) const {
         BOOST_FOREACH (const StartStop& region, good_regions) {
+            ASSERT_LTE(0, region.first);
+            ASSERT_LTE(region.first, region.second);
+            ASSERT_LT(region.second, blockLength());
             // these checks are always true if good_regions
             // were built with buildGoodRegions
             if (!testRegion(region, min_identity)) {
@@ -223,6 +226,13 @@ public:
             if (!fixEnds(copy, min_end) || copy != region) {
                 return "good region has bad end";
             }
+        }
+        // make sure that regions do not overlap and are sorted
+        for (int next = 1; next < good_regions.size(); next++) {
+            int curr = next - 1;
+            ASSERT_LT(good_regions[curr].second,
+                      good_regions[next].first);
+
         }
         // global identity is good
         StartStop all(0, maxPos());
