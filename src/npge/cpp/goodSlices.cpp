@@ -203,7 +203,8 @@ public:
     }
 
     // see https://github.com/npge/npge/issues/26
-    bool isGoodBlock(
+    // return 0 if the block is good
+    const char* isGoodBlock(
         const Coordinates& good_regions,
         int min_length,
         int min_identity,
@@ -220,7 +221,7 @@ public:
         // global identity is good
         StartStop all(0, maxPos());
         if (!testRegion(all, min_identity)) {
-            return false;
+            return "low global identity";
         }
         // find bad blocks
         Coordinates bad;
@@ -228,19 +229,19 @@ public:
         // no bad block >= MIN_LENGTH
         BOOST_FOREACH (const StartStop& bad_region, bad) {
             if (ssLength(bad_region) >= min_length) {
-                return false;
+                return "bad region longer than min_length";
             }
         }
         // first and last blocks are good
         if (!bad.empty()) {
             if (bad.front().first == 0) {
-                return false;
+                return "opens with bad region";
             }
             if (bad.back().second == maxPos()) {
-                return false;
+                return "closes with bad region";
             }
         }
-        return false;
+        return 0; // the block is good
     }
 
     // O(N^2)
