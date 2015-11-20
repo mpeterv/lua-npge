@@ -234,6 +234,17 @@ public:
                       good_regions[next].first);
 
         }
+        // make sure that bad regions inside < min_length
+        // always true for buildGoodRegions
+        int bad_length = 0;
+        for (int i = 0; i <= blockLength(); i++) {
+            if (countScore(i, i) < MAX_COLUMN_SCORE) {
+                bad_length += 1;
+                if (bad_length >= min_length) {
+                    return "many bad columns in a row";
+                }
+            }
+        }
         // global identity is good
         StartStop all(0, maxPos());
         if (!testRegion(all, min_identity)) {
