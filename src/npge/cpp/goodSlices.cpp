@@ -210,13 +210,19 @@ public:
         int min_identity,
         int min_end
     ) const {
-        // Asserts: are true if built with buildGoodRegions
         BOOST_FOREACH (const StartStop& region, good_regions) {
-            ASSERT_TRUE(testRegion(region, min_identity));
-            ASSERT_GTE(ssLength(region), min_length);
+            // these checks are always true if good_regions
+            // were built with buildGoodRegions
+            if (!testRegion(region, min_identity)) {
+                return "low region identity";
+            }
+            if (ssLength(region) < min_length) {
+                return "short good region";
+            }
             StartStop copy = region;
-            fixEnds(copy, min_end);
-            ASSERT_TRUE(copy == region);
+            if (!fixEnds(copy, min_end) || copy != region) {
+                return "good region has bad end";
+            }
         }
         // global identity is good
         StartStop all(0, maxPos());
