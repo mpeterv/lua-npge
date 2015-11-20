@@ -348,6 +348,21 @@ public:
     }
 };
 
+Coordinates goodRegions(const Scores& score,
+                        int frame_length, int end_length,
+                        int min_identity, int min_length) {
+    GoodSlicer slicer(score);
+    Coordinates good_regions;
+    slicer.buildGoodRegions(
+        good_regions,
+        frame_length,
+        min_length,
+        min_identity,
+        end_length
+    );
+    return good_regions;
+}
+
 Coordinates goodSlices(const Scores& score,
                        int frame_length, int end_length,
                        int min_identity, int min_length) {
@@ -368,6 +383,38 @@ Coordinates goodSlices(const Scores& score,
         min_identity
     );
     return good_slices;
+}
+
+const char* isGoodBlock(const Scores& score,
+                        int frame_length, int end_length,
+                        int min_identity, int min_length) {
+    GoodSlicer slicer(score);
+    Coordinates good_regions;
+    slicer.buildGoodRegions(
+        good_regions,
+        frame_length,
+        min_length,
+        min_identity,
+        end_length
+    );
+    return slicer.isGoodBlock(
+        good_regions,
+        min_length,
+        min_identity,
+        end_length
+    );
+}
+
+const char* areGoodRegions(const Scores& score, Coordinates good_regions,
+                           int frame_length, int end_length,
+                           int min_identity, int min_length) {
+    GoodSlicer slicer(score);
+    return slicer.isGoodBlock(
+        good_regions,
+        min_length,
+        min_identity,
+        end_length
+    );
 }
 
 }
