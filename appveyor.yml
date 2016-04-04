@@ -8,13 +8,26 @@ os:
 environment:
   LuaRocks: 2.3.0
   matrix:
+  - Lua: lua 5.1
+  - Lua: lua 5.2
+  - Lua: lua 5.2 --compat=none
   - Lua: lua 5.3
+  - Lua: lua 5.3 --compat=none
   - Lua: luajit 2.0
+  - Lua: luajit 2.1
 
 configuration:
-  - mingw
-  - vs_32
-  - vs_64
+  - vs13_32
+  - vs13_64
+
+# this is how to allow failing jobs in the matrix
+matrix:
+  # LuaJIT crashes on C++ exception on x86
+  allow_failures:
+    - configuration: vs13_32
+      Lua: luajit 2.0
+    - configuration: vs13_32
+      Lua: luajit 2.1
 
 cache:
   #- c:\lua -> appveyor.yml
@@ -23,7 +36,7 @@ cache:
 
 install:
 # Setup Lua development/build environment
-- PATH %CD%\here\bin;C:\mingw\bin;%PATH%
+- PATH %CD%\here\bin;%PATH%
 - curl --location --silent --fail --max-time 120 --connect-timeout 30 https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py > hererocks.py
 - python hererocks.py here --%Lua% --luarocks=%LuaRocks% --verbose --target=%Configuration% --no-git-cache
 # Downloand and install blast to c:\blast
@@ -32,15 +45,13 @@ install:
 - luarocks install lua-term 0.3-1  # 0.4 is broken on Windows
 - luarocks install busted
 - luarocks install luacov
-- if "%LUA_SHORTV%"=="5.1" luarocks install bit32
+- if "%Lua%"=="lua 5.1" luarocks install bit32
 - luarocks install luacov-coveralls
 - luarocks install lua-llthreads2
 - luarocks install tree
 
 build_script:
-- set lua_npge_cflags="/nologo /MD /O2 /EHa"
-- if "%Configuration%" EQU "mingw" ( set lua_npge_cflags="-O2" )
-- luarocks make BOOST_INCDIR=c:\Libraries\boost CFLAGS=%lua_npge_cflags%
+- luarocks make BOOST_INCDIR=c:\Libraries\boost "CFLAGS=/nologo /MD /O2 /EHa"
 
 test_script:
 - cd %APPVEYOR_BUILD_FOLDER%
